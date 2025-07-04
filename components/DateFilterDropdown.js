@@ -73,7 +73,7 @@ const DateFilterDropdown = ({ onRangeChange }) => {
     <>
       <button
         onClick={() => setShowDropdown(true)}
-        className="px-4 py-2 flex gap-2 "
+        className="px-4 py-2 flex gap-2 items-center"
       >
         <Image src={calendar} alt="calendar" /> {selectedLabel}{" "}
         <Image src={dropdown} alt="dropdown" />
@@ -82,14 +82,14 @@ const DateFilterDropdown = ({ onRangeChange }) => {
       {showDropdown && (
         <div
           id="dropdown-overlay"
-          className="fixed inset-0 bg-[rgba(0,0,0,0.1)] z-50 bg-opacity-40 flex items-center justify-center"
+          className="fixed inset-0 bg-[rgba(0,0,0,0.1)] z-50 bg-opacity-40 flex items-center justify-center sm:px-2"
           onClick={handleOverlayClick}
         >
           <div
-            className="bg-white rounded-md shadow-lg flex w-auto max-w-full p-4"
+            className="bg-white rounded-md shadow-lg flex flex-col sm:flex-row w-full max-w-[90vw] sm:max-w-fit p-4 overflow-auto max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex flex-col border-r pr-4 min-w-[140px]">
+            <div className="flex flex-col border-b sm:border-b-0 sm:border-r sm:pr-4 sm:min-w-[140px] mb-4 sm:mb-0">
               {predefinedRanges.map(({ label, startDate }) => (
                 <button
                   key={label}
@@ -100,14 +100,14 @@ const DateFilterDropdown = ({ onRangeChange }) => {
                 </button>
               ))}
             </div>
-            <div className="pl-4">
+            <div className="sm:pl-4">
               <DateRange
                 editableDateInputs={true}
                 onChange={handleCalendarChange}
                 moveRangeOnFirstSelection={false}
                 ranges={range}
-                months={2}
-                direction="horizontal"
+                months={window.innerWidth < 640 ? 1 : 2} // Responsive months
+                direction={window.innerWidth < 640 ? "vertical" : "horizontal"} // Stack vertically on small screens
               />
             </div>
           </div>
