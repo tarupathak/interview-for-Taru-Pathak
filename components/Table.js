@@ -14,6 +14,14 @@ const Table = () => {
   const [launchStatus, setLaunchStatus] = useState("allLaunches");
   const [customStartDate, setCustomStartDate] = useState(null);
   const [customEndDate, setCustomEndDate] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const totalPages = Math.ceil(launches.length / itemsPerPage);
+  const currentItems = launches.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   useEffect(() => {
     const fetchLaunches = async () => {
@@ -167,7 +175,7 @@ const Table = () => {
                 </td>
               </tr>
             ) : (
-              launches.map((launch, index) => (
+              currentItems.map((launch, index) => (
                 <tr
                   key={launch.id}
                   className="hover:bg-gray-50 cursor-pointer"
@@ -204,6 +212,51 @@ const Table = () => {
             )}
           </tbody>
         </table>
+      </div>
+      <div className="flex justify-end items-right gap-1 mt-4">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-3 py-2 rounded-lg border text-gray-700 hover:bg-gray-100 disabled:text-gray-400"
+        >
+          &#x276E;
+        </button>
+
+        {(() => {
+          const pages = [];
+          if (totalPages <= 5) {
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+          } else if (currentPage <= 3) {
+            pages.push(1, 2, 3, "...", totalPages);
+          } else if (currentPage >= totalPages - 2) {
+            pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
+          } else {
+            pages.push(1, "...", currentPage, "...", totalPages);
+          }
+
+          return pages.map((page, index) => (
+            <button
+              key={index}
+              onClick={() => page !== "..." && setCurrentPage(page)}
+              disabled={page === "..."}
+              className={`px-3 py-2 rounded-lg border text-gray-700 hover:bg-gray-100 ${
+                currentPage === page ? "font-semibold text-gray-900" : ""
+              } ${page === "..." ? "cursor-default" : ""}`}
+            >
+              {page}
+            </button>
+          ));
+        })()}
+
+        <button
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
+          disabled={currentPage === totalPages}
+          className="px-3 py-2 rounded-lg border text-gray-700 hover:bg-gray-100 disabled:text-gray-400"
+        >
+          &#x276F;
+        </button>
       </div>
       {selectedLaunch && (
         <LaunchPopup
