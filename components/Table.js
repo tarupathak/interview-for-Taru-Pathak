@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import LaunchPopup from "@/components/LaunchPopup"; 
+import LaunchPopup from "@/components/LaunchPopup"; // Assuming this component exists
+import { FormControl, InputLabel, Select, MenuItem, Box } from "@mui/material";
 
 const Table = () => {
   const [launches, setLaunches] = useState([]);
   const [selectedLaunch, setSelectedLaunch] = useState(null);
+  const [timeRange, setTimeRange] = useState("last6Months"); // State for "Last 6 Months" dropdown
+  const [launchStatus, setLaunchStatus] = useState("allLaunches"); // State for "All Launches" dropdown
 
   useEffect(() => {
     const fetchLaunches = async () => {
@@ -12,14 +15,49 @@ const Table = () => {
         const { data } = await axios.get(
           "https://api.spacexdata.com/v5/launches"
         );
-        const recent = data.slice(0, 12);
+
+        let filteredData = data;
+
+        if (timeRange === "last6Months") {
+          const sixMonthsAgo = new Date();
+          sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+          filteredData = filteredData.filter(
+            (launch) => new Date(launch.date_utc) >= sixMonthsAgo
+          );
+        } else if (timeRange === "lastYear") {
+          const oneYearAgo = new Date();
+          oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+          filteredData = filteredData.filter(
+            (launch) => new Date(launch.date_utc) >= oneYearAgo
+          );
+        }
+
+        if (launchStatus === "upcomingLaunches") {
+          filteredData = filteredData.filter((launch) => launch.upcoming);
+        } else if (launchStatus === "successfulLaunches") {
+          filteredData = filteredData.filter(
+            (launch) => !launch.upcoming && launch.success
+          );
+        } else if (launchStatus === "failedLaunches") {
+          filteredData = filteredData.filter(
+            (launch) => !launch.upcoming && launch.success === false
+          );
+        }
+
+        const recent = filteredData.slice(0, 12);
 
         const resolved = await Promise.all(
           recent.map(async (launch) => {
             const [rocketRes, launchpadRes, payloadRes] = await Promise.all([
-              axios.get(`https://api.spacexdata.com/v4/rockets/${launch.rocket}`),
-              axios.get(`https://api.spacexdata.com/v4/launchpads/${launch.launchpad}`),
-              axios.get(`https://api.spacexdata.com/v4/payloads/${launch.payloads[0]}`),
+              axios.get(
+                `https://api.spacexdata.com/v4/rockets/${launch.rocket}`
+              ),
+              axios.get(
+                `https://api.spacexdata.com/v4/launchpads/${launch.launchpad}`
+              ),
+              axios.get(
+                `https://api.spacexdata.com/v4/payloads/${launch.payloads[0]}`
+              ),
             ]);
 
             return {
@@ -43,19 +81,109 @@ const Table = () => {
     };
 
     fetchLaunches();
-  }, []);
+  }, [timeRange, launchStatus]);
+
+  const handleTimeRangeChange = (event) => {
+    setTimeRange(event.target.value);
+  };
+
+  const handleLaunchStatusChange = (event) => {
+    setLaunchStatus(event.target.value);
+  };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex gap-4">
-          <button className="px-4 py-2 border rounded bg-white shadow-sm">
-            Last 6 Months ▾
-          </button>
-        </div>
-        <button className="px-4 py-2 border rounded bg-white shadow-sm">
-          All Launches ▾
-        </button>
+    <div className="p-6 font-sans">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4 sm:gap-0">
+        {/* Time Range Dropdown */}
+        <FormControl
+          variant="outlined"
+          size="small"
+          className="w-full sm:w-auto min-w-[180px] bg-white rounded-md shadow-sm"
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "0.5rem", // rounded-lg
+              "& fieldset": {
+                borderColor: "#D1D5DB", // border-gray-300
+              },
+              "&:hover fieldset": {
+                borderColor: "#9CA3AF", // hover:border-gray-400
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#6366F1", // focus:border-indigo-500
+              },
+            },
+            "& .MuiInputLabel-root": {
+              color: "#4B5563", // text-gray-700
+            },
+            "& .MuiSelect-select": {
+              paddingTop: "0.5rem",
+              paddingBottom: "0.5rem",
+              fontSize: "0.875rem", // text-sm
+            },
+            "& .MuiSvgIcon-root": {
+              color: "#4B5563", // text-gray-700
+            },
+          }}
+        >
+          <InputLabel id="time-range-label">Time Range</InputLabel>
+          <Select
+            labelId="time-range-label"
+            id="time-range-select"
+            value={timeRange}
+            onChange={handleTimeRangeChange}
+            label="Time Range"
+          >
+            <MenuItem value="last6Months">Last 6 Months</MenuItem>
+            <MenuItem value="lastYear">Last Year</MenuItem>
+            <MenuItem value="allTime">All Time</MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* Launch Status Dropdown */}
+        <FormControl
+          variant="outlined"
+          size="small"
+          className="w-full sm:w-auto min-w-[180px] bg-white rounded-md shadow-sm"
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "0.5rem", // rounded-lg
+              "& fieldset": {
+                borderColor: "#D1D5DB", // border-gray-300
+              },
+              "&:hover fieldset": {
+                borderColor: "#9CA3AF", // hover:border-gray-400
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#6366F1", // focus:border-indigo-500
+              },
+            },
+            "& .MuiInputLabel-root": {
+              color: "#4B5563", // text-gray-700
+            },
+            "& .MuiSelect-select": {
+              paddingTop: "0.5rem",
+              paddingBottom: "0.5rem",
+              fontSize: "0.875rem", // text-sm
+            },
+            "& .MuiSvgIcon-root": {
+              color: "#4B5563", // text-gray-700
+            },
+          }}
+        >
+          <InputLabel id="launch-status-label">Launch Status</InputLabel>
+          <Select
+            labelId="launch-status-label"
+            id="launch-status-select"
+            value={launchStatus}
+            onChange={handleLaunchStatusChange}
+            label="Launch Status"
+          >
+            <MenuItem value="allLaunches">All Launches</MenuItem>
+            <MenuItem value="upcomingLaunches">Upcoming Launches</MenuItem>
+            <MenuItem value="successfulLaunches">Successful Launches</MenuItem>
+            <MenuItem value="failedLaunches">Failed Launches</MenuItem>
+          </Select>
+        </FormControl>
       </div>
       <div className="overflow-x-auto shadow rounded-lg border border-gray-200">
         <table className="min-w-full divide-y divide-gray-200 text-sm text-left">
@@ -71,40 +199,48 @@ const Table = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {launches.map((launch, index) => (
-              <tr
-                key={launch.id}
-                className="hover:bg-gray-50 cursor-pointer"
-                onClick={() => setSelectedLaunch(launch)}
-              >
-                <td className="px-6 py-3 font-medium">{index + 1}</td>
-                <td className="px-6 py-3">
-                  {new Date(launch.date_utc).toUTCString()}
+            {launches.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="text-center py-6 text-gray-800 font-semibold">
+                  No results found for the specified filter
                 </td>
-                <td className="px-6 py-3">{launch.launchpadName}</td>
-                <td className="px-6 py-3">{launch.name}</td>
-                <td className="px-6 py-3">{launch.orbit}</td>
-                <td className="px-6 py-3">
-                  <span
-                    className={`inline-block px-2 py-1 text-xs font-semibold rounded-full 
-                      ${
-                        launch.upcoming
-                          ? "bg-[#FEF3C7] text-[#92400F]"
-                          : launch.success
-                          ? "bg-[#DEF7EC] text-[#03543F]"
-                          : "bg-[#FDE2E1] text-[#981B1C]"
-                      }`}
-                  >
-                    {launch.upcoming
-                      ? "Upcoming"
-                      : launch.success
-                      ? "Success"
-                      : "Failed"}
-                  </span>
-                </td>
-                <td className="px-6 py-3">{launch.rocketName}</td>
               </tr>
-            ))}
+            ) : (
+              launches.map((launch, index) => (
+                <tr
+                  key={launch.id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => setSelectedLaunch(launch)}
+                >
+                  <td className="px-6 py-3 font-medium">{index + 1}</td>
+                  <td className="px-6 py-3">
+                    {new Date(launch.date_utc).toUTCString()}
+                  </td>
+                  <td className="px-6 py-3">{launch.launchpadName}</td>
+                  <td className="px-6 py-3">{launch.name}</td>
+                  <td className="px-6 py-3">{launch.orbit}</td>
+                  <td className="px-6 py-3">
+                    <span
+                      className={`inline-block px-2 py-1 text-xs font-semibold rounded-full 
+            ${
+              launch.upcoming
+                ? "bg-[#FEF3C7] text-[#92400F]"
+                : launch.success
+                ? "bg-[#DEF7EC] text-[#03543F]"
+                : "bg-[#FDE2E1] text-[#981B1C]"
+            }`}
+                    >
+                      {launch.upcoming
+                        ? "Upcoming"
+                        : launch.success
+                        ? "Success"
+                        : "Failed"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-3">{launch.rocketName}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
