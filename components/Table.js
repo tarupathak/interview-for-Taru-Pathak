@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import LaunchPopup from "@/components/LaunchPopup"; 
+import LaunchPopup from "@/components/LaunchPopup";
 import { FormControl, InputLabel, Select, MenuItem, Box } from "@mui/material";
+import DateFilterDropdown from "./DateFilterDropdown";
+import filter from "@/public/filter.svg";
+import dropdown from "@/public/dropdown.svg";
+import Image from "next/image";
 
 const Table = () => {
   const [launches, setLaunches] = useState([]);
   const [selectedLaunch, setSelectedLaunch] = useState(null);
   const [timeRange, setTimeRange] = useState("last6Months");
-  const [launchStatus, setLaunchStatus] = useState("allLaunches"); 
+  const [launchStatus, setLaunchStatus] = useState("allLaunches");
+  const [customStartDate, setCustomStartDate] = useState(null);
+  const [customEndDate, setCustomEndDate] = useState(null);
 
   useEffect(() => {
     const fetchLaunches = async () => {
@@ -18,18 +24,11 @@ const Table = () => {
 
         let filteredData = data;
 
-        if (timeRange === "last6Months") {
-          const sixMonthsAgo = new Date();
-          sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-          filteredData = filteredData.filter(
-            (launch) => new Date(launch.date_utc) >= sixMonthsAgo
-          );
-        } else if (timeRange === "lastYear") {
-          const oneYearAgo = new Date();
-          oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-          filteredData = filteredData.filter(
-            (launch) => new Date(launch.date_utc) >= oneYearAgo
-          );
+        if (customStartDate && customEndDate) {
+          filteredData = filteredData.filter((launch) => {
+            const date = new Date(launch.date_utc);
+            return date >= customStartDate && date <= customEndDate;
+          });
         }
 
         if (launchStatus === "upcomingLaunches") {
@@ -81,7 +80,7 @@ const Table = () => {
     };
 
     fetchLaunches();
-  }, [timeRange, launchStatus]);
+  }, [timeRange, launchStatus, customStartDate, customEndDate]);
 
   const handleTimeRangeChange = (event) => {
     setTimeRange(event.target.value);
@@ -95,93 +94,54 @@ const Table = () => {
     <div className="p-6 font-sans">
       <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4 sm:gap-0">
         <FormControl
-          variant="outlined"
           size="small"
-          className="w-full sm:w-auto min-w-[180px] bg-white rounded-md shadow-sm"
           sx={{
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "0.5rem", 
-              "& fieldset": {
-                borderColor: "#D1D5DB",
-              },
-              "&:hover fieldset": {
-                borderColor: "#9CA3AF",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "#6366F1", 
-              },
-            },
             "& .MuiInputLabel-root": {
-              color: "#4B5563", 
+              color: "#4B5563",
             },
             "& .MuiSelect-select": {
               paddingTop: "0.5rem",
               paddingBottom: "0.5rem",
-              fontSize: "0.875rem", 
+              fontSize: "0.875rem",
             },
             "& .MuiSvgIcon-root": {
-              color: "#4B5563", 
+              color: "#4B5563",
             },
           }}
         >
-          <InputLabel id="time-range-label">Time Range</InputLabel>
-          <Select
-            labelId="time-range-label"
-            id="time-range-select"
-            value={timeRange}
-            onChange={handleTimeRangeChange}
-            label="Time Range"
-          >
-            <MenuItem value="last6Months">Last 6 Months</MenuItem>
-            <MenuItem value="lastYear">Last Year</MenuItem>
-            <MenuItem value="allTime">All Time</MenuItem>
-          </Select>
+          <DateFilterDropdown
+            onRangeChange={(startDate, endDate) => {
+              setCustomStartDate(startDate);
+              setCustomEndDate(endDate);
+              setTimeRange("custom");
+            }}
+          />
         </FormControl>
 
-        <FormControl
-          variant="outlined"
-          size="small"
-          className="w-full sm:w-auto min-w-[180px] bg-white rounded-md shadow-sm"
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "0.5rem",
-              "& fieldset": {
-                borderColor: "#D1D5DB", 
-              },
-              "&:hover fieldset": {
-                borderColor: "#9CA3AF", 
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "#6366F1", 
-              },
-            },
-            "& .MuiInputLabel-root": {
-              color: "#4B5563", 
-            },
-            "& .MuiSelect-select": {
-              paddingTop: "0.5rem",
-              paddingBottom: "0.5rem",
-              fontSize: "0.875rem", 
-            },
-            "& .MuiSvgIcon-root": {
-              color: "#4B5563", 
-            },
-          }}
-        >
-          <InputLabel id="launch-status-label">Launch Status</InputLabel>
+        <div className="flex items-center gap-1">
+          <Image src={filter} alt="filter" />
           <Select
-            labelId="launch-status-label"
-            id="launch-status-select"
             value={launchStatus}
             onChange={handleLaunchStatusChange}
-            label="Launch Status"
+            variant="standard"
+            disableUnderline
+            className="text-gray-700 font-medium"
+            sx={{
+              "& .MuiSelect-select": {
+                padding: 0,
+                fontSize: "1rem",
+              },
+              "& svg": {
+                marginLeft: "0.25rem",
+              },
+            }}
           >
             <MenuItem value="allLaunches">All Launches</MenuItem>
             <MenuItem value="upcomingLaunches">Upcoming Launches</MenuItem>
             <MenuItem value="successfulLaunches">Successful Launches</MenuItem>
             <MenuItem value="failedLaunches">Failed Launches</MenuItem>
           </Select>
-        </FormControl>
+        </div>
       </div>
       <div className="overflow-x-auto shadow rounded-lg border border-gray-200">
         <table className="min-w-full divide-y divide-gray-200 text-sm text-left">
@@ -199,7 +159,10 @@ const Table = () => {
           <tbody className="divide-y divide-gray-100">
             {launches.length === 0 ? (
               <tr>
-                <td colSpan="7" className="text-center py-6 text-gray-800 font-semibold">
+                <td
+                  colSpan="7"
+                  className="text-center py-6 text-gray-800 font-semibold"
+                >
                   No results found for the specified filter
                 </td>
               </tr>
