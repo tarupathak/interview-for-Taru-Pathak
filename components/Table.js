@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import LaunchPopup from "@/components/LaunchPopup"; // Assuming this component exists
+import LaunchPopup from "@/components/LaunchPopup"; 
 import { FormControl, InputLabel, Select, MenuItem, Box } from "@mui/material";
 
 const Table = () => {
   const [launches, setLaunches] = useState([]);
   const [selectedLaunch, setSelectedLaunch] = useState(null);
-  const [timeRange, setTimeRange] = useState("last6Months"); // State for "Last 6 Months" dropdown
-  const [launchStatus, setLaunchStatus] = useState("allLaunches"); // State for "All Launches" dropdown
+  const [timeRange, setTimeRange] = useState("last6Months");
+  const [launchStatus, setLaunchStatus] = useState("allLaunches"); 
 
   useEffect(() => {
     const fetchLaunches = async () => {
@@ -94,34 +94,33 @@ const Table = () => {
   return (
     <div className="p-6 font-sans">
       <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4 sm:gap-0">
-        {/* Time Range Dropdown */}
         <FormControl
           variant="outlined"
           size="small"
           className="w-full sm:w-auto min-w-[180px] bg-white rounded-md shadow-sm"
           sx={{
             "& .MuiOutlinedInput-root": {
-              borderRadius: "0.5rem", // rounded-lg
+              borderRadius: "0.5rem", 
               "& fieldset": {
-                borderColor: "#D1D5DB", // border-gray-300
+                borderColor: "#D1D5DB",
               },
               "&:hover fieldset": {
-                borderColor: "#9CA3AF", // hover:border-gray-400
+                borderColor: "#9CA3AF",
               },
               "&.Mui-focused fieldset": {
-                borderColor: "#6366F1", // focus:border-indigo-500
+                borderColor: "#6366F1", 
               },
             },
             "& .MuiInputLabel-root": {
-              color: "#4B5563", // text-gray-700
+              color: "#4B5563", 
             },
             "& .MuiSelect-select": {
               paddingTop: "0.5rem",
               paddingBottom: "0.5rem",
-              fontSize: "0.875rem", // text-sm
+              fontSize: "0.875rem", 
             },
             "& .MuiSvgIcon-root": {
-              color: "#4B5563", // text-gray-700
+              color: "#4B5563", 
             },
           }}
         >
@@ -139,34 +138,33 @@ const Table = () => {
           </Select>
         </FormControl>
 
-        {/* Launch Status Dropdown */}
         <FormControl
           variant="outlined"
           size="small"
           className="w-full sm:w-auto min-w-[180px] bg-white rounded-md shadow-sm"
           sx={{
             "& .MuiOutlinedInput-root": {
-              borderRadius: "0.5rem", // rounded-lg
+              borderRadius: "0.5rem",
               "& fieldset": {
-                borderColor: "#D1D5DB", // border-gray-300
+                borderColor: "#D1D5DB", 
               },
               "&:hover fieldset": {
-                borderColor: "#9CA3AF", // hover:border-gray-400
+                borderColor: "#9CA3AF", 
               },
               "&.Mui-focused fieldset": {
-                borderColor: "#6366F1", // focus:border-indigo-500
+                borderColor: "#6366F1", 
               },
             },
             "& .MuiInputLabel-root": {
-              color: "#4B5563", // text-gray-700
+              color: "#4B5563", 
             },
             "& .MuiSelect-select": {
               paddingTop: "0.5rem",
               paddingBottom: "0.5rem",
-              fontSize: "0.875rem", // text-sm
+              fontSize: "0.875rem", 
             },
             "& .MuiSvgIcon-root": {
-              color: "#4B5563", // text-gray-700
+              color: "#4B5563", 
             },
           }}
         >
