@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import LaunchPopup from "@/components/LaunchPopup"; 
 
 const Table = () => {
   const [launches, setLaunches] = useState([]);
@@ -16,15 +17,9 @@ const Table = () => {
         const resolved = await Promise.all(
           recent.map(async (launch) => {
             const [rocketRes, launchpadRes, payloadRes] = await Promise.all([
-              axios.get(
-                `https://api.spacexdata.com/v4/rockets/${launch.rocket}`
-              ),
-              axios.get(
-                `https://api.spacexdata.com/v4/launchpads/${launch.launchpad}`
-              ),
-              axios.get(
-                `https://api.spacexdata.com/v4/payloads/${launch.payloads[0]}`
-              ),
+              axios.get(`https://api.spacexdata.com/v4/rockets/${launch.rocket}`),
+              axios.get(`https://api.spacexdata.com/v4/launchpads/${launch.launchpad}`),
+              axios.get(`https://api.spacexdata.com/v4/payloads/${launch.payloads[0]}`),
             ]);
 
             return {
@@ -91,13 +86,13 @@ const Table = () => {
                 <td className="px-6 py-3">{launch.orbit}</td>
                 <td className="px-6 py-3">
                   <span
-                    className={`inline-block px-2 py-1 text-xs font-semibold rounded-full text-white
+                    className={`inline-block px-2 py-1 text-xs font-semibold rounded-full 
                       ${
                         launch.upcoming
-                          ? "bg-yellow-500"
+                          ? "bg-[#FEF3C7] text-[#92400F]"
                           : launch.success
-                          ? "bg-green-600"
-                          : "bg-red-500"
+                          ? "bg-[#DEF7EC] text-[#03543F]"
+                          : "bg-[#FDE2E1] text-[#981B1C]"
                       }`}
                   >
                     {launch.upcoming
@@ -113,6 +108,12 @@ const Table = () => {
           </tbody>
         </table>
       </div>
+      {selectedLaunch && (
+        <LaunchPopup
+          launch={selectedLaunch}
+          onClose={() => setSelectedLaunch(null)}
+        />
+      )}
     </div>
   );
 };
