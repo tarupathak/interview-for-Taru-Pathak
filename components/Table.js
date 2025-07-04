@@ -6,6 +6,7 @@ import DateFilterDropdown from "./DateFilterDropdown";
 import filter from "@/public/filter.svg";
 import Image from "next/image";
 import loaderImg from "@/public/loader.svg";
+import Pagination from "@mui/material/Pagination";
 
 const Table = () => {
   const [launches, setLaunches] = useState([]);
@@ -156,7 +157,7 @@ const Table = () => {
         </div>
       </div>
       <div className="overflow-x-auto shadow rounded-lg border border-gray-200">
-        <table className="min-w-full h-screen divide-y divide-gray-200 text-sm text-left">
+        <table className="min-w-full  divide-y divide-gray-200 text-sm text-left">
           <thead className="bg-gray-50 text-xs uppercase text-gray-700">
             <tr>
               <th className="px-6 py-3">No.</th>
@@ -230,51 +231,17 @@ const Table = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex justify-end items-right gap-1 mt-4">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="px-3 py-2 rounded-lg border text-gray-700 hover:bg-gray-100 disabled:text-gray-400"
-        >
-          &#x276E;
-        </button>
-
-        {(() => {
-          const pages = [];
-          if (totalPages <= 5) {
-            for (let i = 1; i <= totalPages; i++) pages.push(i);
-          } else if (currentPage <= 3) {
-            pages.push(1, 2, 3, "...", totalPages);
-          } else if (currentPage >= totalPages - 2) {
-            pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
-          } else {
-            pages.push(1, "...", currentPage, "...", totalPages);
-          }
-
-          return pages.map((page, index) => (
-            <button
-              key={index}
-              onClick={() => page !== "..." && setCurrentPage(page)}
-              disabled={page === "..."}
-              className={`px-3 py-2 rounded-lg border text-gray-700 hover:bg-gray-100 ${
-                currentPage === page ? "font-semibold text-gray-900" : ""
-              } ${page === "..." ? "cursor-default" : ""}`}
-            >
-              {page}
-            </button>
-          ));
-        })()}
-
-        <button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages}
-          className="px-3 py-2 rounded-lg border text-gray-700 hover:bg-gray-100 disabled:text-gray-400"
-        >
-          &#x276F;
-        </button>
+      <div className="flex justify-end mt-4">
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={(event, value) => setCurrentPage(value)}
+          color="primary"
+          variant="outlined"
+          shape="rounded"
+        />
       </div>
+
       {selectedLaunch && (
         <LaunchPopup
           launch={selectedLaunch}
