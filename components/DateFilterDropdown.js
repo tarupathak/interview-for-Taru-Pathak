@@ -17,7 +17,7 @@ const DateFilterDropdown = ({ onRangeChange }) => {
       key: "selection",
     },
   ]);
-  const [selectedLabel, setSelectedLabel] = useState("Last 6 Months");
+  const [selectedLabel, setSelectedLabel] = useState("All Time");
 
   const predefinedRanges = [
     { label: "All time", startDate: null },

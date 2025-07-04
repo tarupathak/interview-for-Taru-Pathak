@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import LaunchPopup from "@/components/LaunchPopup";
-import { FormControl, InputLabel, Select, MenuItem, Box } from "@mui/material";
+import { FormControl, Select, MenuItem, Box } from "@mui/material";
 import DateFilterDropdown from "./DateFilterDropdown";
 import filter from "@/public/filter.svg";
-import dropdown from "@/public/dropdown.svg";
 import Image from "next/image";
+import loaderImg from "@/public/loader.svg";
 
 const Table = () => {
   const [launches, setLaunches] = useState([]);
@@ -15,6 +15,7 @@ const Table = () => {
   const [customStartDate, setCustomStartDate] = useState(null);
   const [customEndDate, setCustomEndDate] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
   const itemsPerPage = 10;
 
   const totalPages = Math.ceil(launches.length / itemsPerPage);
@@ -25,6 +26,7 @@ const Table = () => {
 
   useEffect(() => {
     const fetchLaunches = async () => {
+      setLoading(true); // ✅ Start loader
       try {
         const { data } = await axios.get(
           "https://api.spacexdata.com/v5/launches"
@@ -84,6 +86,8 @@ const Table = () => {
         setLaunches(resolved);
       } catch (err) {
         console.error("Failed to fetch launch data", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -152,7 +156,7 @@ const Table = () => {
         </div>
       </div>
       <div className="overflow-x-auto shadow rounded-lg border border-gray-200">
-        <table className="min-w-full divide-y divide-gray-200 text-sm text-left">
+        <table className="min-w-full h-screen divide-y divide-gray-200 text-sm text-left">
           <thead className="bg-gray-50 text-xs uppercase text-gray-700">
             <tr>
               <th className="px-6 py-3">No.</th>
@@ -165,7 +169,20 @@ const Table = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {launches.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan="7" className="text-center py-10">
+                  <Image
+                    src={loaderImg}
+                    alt="Loading"
+                    width={180}
+                    height={180}
+                    className="mx-auto animate-spin"
+                    unoptimized
+                  />
+                </td>
+              </tr>
+            ) : launches.length === 0 ? (
               <tr>
                 <td
                   colSpan="7"
@@ -191,13 +208,13 @@ const Table = () => {
                   <td className="px-6 py-3">
                     <span
                       className={`inline-block px-2 py-1 text-xs font-semibold rounded-full 
-            ${
-              launch.upcoming
-                ? "bg-[#FEF3C7] text-[#92400F]"
-                : launch.success
-                ? "bg-[#DEF7EC] text-[#03543F]"
-                : "bg-[#FDE2E1] text-[#981B1C]"
-            }`}
+              ${
+                launch.upcoming
+                  ? "bg-[#FEF3C7] text-[#92400F]"
+                  : launch.success
+                  ? "bg-[#DEF7EC] text-[#03543F]"
+                  : "bg-[#FDE2E1] text-[#981B1C]"
+              }`}
                     >
                       {launch.upcoming
                         ? "Upcoming"
