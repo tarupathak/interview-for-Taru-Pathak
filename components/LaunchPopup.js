@@ -62,10 +62,10 @@ const LaunchPopup = ({ launch, onClose }) => {
           ].map(([label, value], i) => (
             <div
               key={i}
-              className="flex justify-between border-t border-gray-200 pt-2 mt-2"
+              className="flex justify-between  border-t border-gray-200 pt-2 mt-2"
             >
-              <span className="font-semibold">{label}</span>
-              <span>{value ?? "N/A"}</span>
+              <span className="font-medium">{label}</span>
+              <span className="absolute right-24 justify-start flex">{value ?? "N/A"}</span>
             </div>
           ))}
         </div>

@@ -158,15 +158,15 @@ const Table = () => {
       </div>
       <div className="overflow-x-auto shadow rounded-lg border border-gray-200">
         <table className="min-w-full  divide-y divide-gray-200 text-sm text-left">
-          <thead className="bg-gray-50 text-xs uppercase text-gray-700">
+          <thead className="bg-gray-50 text-base  text-gray-700">
             <tr>
-              <th className="px-6 py-3">No.</th>
-              <th className="px-6 py-3">Launched (UTC)</th>
-              <th className="px-6 py-3">Location</th>
-              <th className="px-6 py-3">Mission</th>
-              <th className="px-6 py-3">Orbit</th>
-              <th className="px-6 py-3">Launch Status</th>
-              <th className="px-6 py-3">Rocket</th>
+              <th className="px-6 py-3 font-semibold">No:</th>
+              <th className="px-6 py-3 font-semibold">Launched (UTC)</th>
+              <th className="px-6 py-3 font-semibold">Location</th>
+              <th className="px-6 py-3 font-semibold">Mission</th>
+              <th className="px-6 py-3 font-semibold">Orbit</th>
+              <th className="px-6 py-3 font-semibold">Launch Status</th>
+              <th className="px-6 py-3 font-semibold">Rocket</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -199,7 +199,9 @@ const Table = () => {
                   className="hover:bg-gray-50 cursor-pointer"
                   onClick={() => setSelectedLaunch(launch)}
                 >
-                  <td className="px-6 py-3 font-medium">{index + 1}</td>
+                  <td className="px-6 py-3 ">
+                    {(index + 1).toString().padStart(2, "0")}
+                  </td>
                   <td className="px-6 py-3">
                     {new Date(launch.date_utc).toUTCString()}
                   </td>
