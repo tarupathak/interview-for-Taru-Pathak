@@ -27,7 +27,9 @@ const Table = () => {
 
   useEffect(() => {
     const fetchLaunches = async () => {
-      setLoading(true); // ✅ Start loader
+      setLoading(true);
+      setLaunches([]);
+
       try {
         const { data } = await axios.get(
           "https://api.spacexdata.com/v5/launches"
@@ -52,6 +54,10 @@ const Table = () => {
           filteredData = filteredData.filter(
             (launch) => !launch.upcoming && launch.success === false
           );
+        }
+        if (filteredData.length === 0) {
+          setLaunches([]);
+          return;
         }
 
         const recent = filteredData.slice(0, 12);
@@ -87,6 +93,7 @@ const Table = () => {
         setLaunches(resolved);
       } catch (err) {
         console.error("Failed to fetch launch data", err);
+        setLaunches([]);
       } finally {
         setLoading(false);
       }
