@@ -75,7 +75,7 @@ const DateFilterDropdown = ({ onRangeChange }) => {
         onClick={() => setShowDropdown(true)}
         className="px-4 py-2 flex gap-2 items-center"
       >
-        <Image src={calendar} alt="calendar" /> {selectedLabel}{" "}
+        <Image src={calendar} alt="calendar" /> {selectedLabel}
         <Image src={dropdown} alt="dropdown" />
       </button>
 
@@ -106,8 +106,8 @@ const DateFilterDropdown = ({ onRangeChange }) => {
                 onChange={handleCalendarChange}
                 moveRangeOnFirstSelection={false}
                 ranges={range}
-                months={window.innerWidth < 640 ? 1 : 2} // Responsive months
-                direction={window.innerWidth < 640 ? "vertical" : "horizontal"} // Stack vertically on small screens
+                months={window.innerWidth < 640 ? 1 : 2}
+                direction={window.innerWidth < 640 ? "vertical" : "horizontal"} 
               />
             </div>
           </div>
